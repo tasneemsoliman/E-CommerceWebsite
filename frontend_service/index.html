@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Love Your Skin</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #d1e7dd; /* Green */
+    }
+    header {
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header img {
+      height: 40px; /* Adjust the height as needed */
+      margin-right: 10px; /* Add some space between the image and the title */
+    }
+    header h1 {
+      font-family: 'Lobster', cursive; /* Use Lobster font for the title */
+      font-size: 2em; /* Adjust font size as needed */
+    }
+    nav {
+      background-color: #5f9ea0; /* Cadet Blue */
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 0px;
+      transition: background-color 0.3s; /* Add transition for smooth hover effect */
+    }
+    nav a:hover,
+    nav a.active {
+      background-color: #417d7f; /* Dark Green */
+    }
+    .product-grid {
+      padding: 20px;
+    }
+    .product-section {
+      margin-bottom: 40px;
+    }
+    .product-section h2 {
+      font-family: 'Lobster', cursive; /* Use Lobster font for the title */
+      font-size: 2em; /* Adjust font size as needed */
+      color: #417d7f; /* Sea Green */
+      border-bottom: 2px solid #417d7f; /* Sea Green */
+      padding-bottom: 10px;
+    }
+    .product {
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: inline-block;
+      width: calc(20% - 20px); /* 20% width with 20px gap between products */
+      text-align: center;
+      margin-right: 20px; /* Add right margin for spacing */
+    }
+    .product:last-child {
+      margin-right: 0; /* Remove right margin for the last product */
+    }
+    .product img {
+      max-width: 100%;
+      height: auto;
+      width: 80%; /* Set the width to 80% */
+    }
+    footer {
+      background-color: #5f9ea0; /* Cadet Blue */
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .latest-sales {
+      padding: 20px;
+    }
+
+    .latest-sales-title {
+      font-family: 'Lobster', cursive; /* Use Lobster font for the title */
+      font-size: 2em; /* Adjust font size as needed */
+      color: #417d7f; /* Sea Green */
+    }
+
+    .sales-products {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .sales-products .product {
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      width: calc(20% - 20px); /* 20% width with 20px gap between products */
+      text-align: center;
+      margin-right: 20px; /* Add right margin for spacing */
+    }
+
+    .sales-products .product:last-child {
+      margin-right: 0; /* Remove right margin for the last product */
+    }
+
+    .sales-products .product img {
+      max-width: 100%;
+      height: auto;
+      width: 80%; /* Set the width to 80% */
+    }
+
+    .sales-products .product h3 {
+      font-size: 1.2em; /* Adjust font size as needed */
+      color: #417d7f; /* Sea Green */
+      margin-top: 10px;
+    }
+
+    .sales-products .product p {
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .old-price {
+      text-decoration: line-through;
+    }
+
+    .new-price {
+      /* Add any additional styling for the new price here */
+    }
+
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo">
+    <h1>Love Your Skin</h1>
+  </header>
+  <nav>
+    <a href="#" class="active">Home</a>
+    <a href="cart.html">Cart</a>
+    <a href="login.html">Login</a>
+  </nav>
+  <div class="product-grid">
+  </div>
+  <div class="latest-sales">
+    <h2 class="latest-sales-title">Latest Sales</h2>
+    <div class="sales-products"></div>
+  </div>
+  
+  <script>
+      const isLoggedIn = localStorage.getItem('userId');
+
+// If not logged in, redirect to the login page
+  if (!isLoggedIn) {
+    window.location.href = '/login.html';
+    }
+   document.addEventListener('DOMContentLoaded', function() {
+    // Function to fetch product data from the API
+    function fetchProducts() {
+        fetch('http://localhost:5003/api/products')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                return response.json();
+            })
+            .then(products => {
+                // Loop through each product in the array
+                products.forEach(product => {
+                    const productElement = createProductElement(product);
+                    document.querySelector('.product-grid').appendChild(productElement);
+                });
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
+
+    // Function to create a product element
+    function createProductElement(product) {
+        const productElement = document.createElement('div');
+        productElement.classList.add('product');
+        productElement.setAttribute('data-product-id', product._id); // Set product ID attribute
+
+        const productImage = document.createElement('img');
+        productImage.src = product.imagePath;
+        productImage.alt = product.name;
+        productElement.appendChild(productImage);
+
+        const productName = document.createElement('h3');
+        productName.textContent = product.name;
+        productElement.appendChild(productName);
+
+        const productPrice = document.createElement('p');
+        productPrice.textContent = typeof product.price === 'number' ? `EGP ${product.price.toFixed(2)}` : 'Price not available';
+        productElement.appendChild(productPrice);
+
+        // Create "add to cart" button
+        const addToCartButton = document.createElement('button');
+        addToCartButton.textContent = 'Add to Cart';
+        addToCartButton.classList.add('add-to-cart-button');
+
+        // Attach click event listener to the "Add to Cart" button
+        addToCartButton.addEventListener('click', function() {
+            const userId = localStorage.getItem('userId'); // Retrieve user ID from local storage
+
+            if (!userId || userId === 'null' || userId === 'undefined') {
+                alert("User not logged in");
+                return; // Exit if user ID is not found
+            }
+
+            const productId = product.id; // Get product ID
+
+            const productData = {
+                userId: userId,
+                productId: productId // Include product ID in the data
+                // Add any additional data about the product you want to add to the cart
+            };
+
+            // Send a POST request to the "/cart" endpoint with product data
+            fetch('http://localhost:5000/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Product added to cart!');
+                    // You can perform any additional actions here after successfully adding the product to the cart
+                } else {
+                    throw new Error('Failed to add product to cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add product to cart');
+            });
+        });
+        productElement.appendChild(addToCartButton);
+
+        return productElement;
+    }
+
+    // Call the function to fetch product data when DOM content is loaded
+    fetchProducts();
+});
+
+    document.addEventListener('DOMContentLoaded', function() {
+  // Define the function to fetch sales data
+    function fetchSalesData() {
+    var xhr = new XMLHttpRequest();
+
+    // Configure the request
+    xhr.open('GET', 'http://localhost:5002/api/flash-sales');
+
+    // Set up event handler for when the request completes
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        // Parse the response JSON
+        var data = JSON.parse(xhr.responseText);
+
+        // Process the data
+        const salesProductsContainer = document.querySelector('.sales-products');
+        data.forEach(sale => {
+          const saleData = sale[Object.keys(sale)[0]];
+          const productElement = document.createElement('div');
+          productElement.classList.add('product');
+          
+          const productImage = document.createElement('img');
+          productImage.src = saleData.imagePath;
+          productImage.alt = saleData.name;
+          productElement.appendChild(productImage);
+          
+          const productName = document.createElement('h3');
+          productName.textContent = saleData.name;
+          productElement.appendChild(productName);
+          
+          const productPrice = document.createElement('p');
+          productPrice.innerHTML = `<span class="old-price">${saleData.old_price}</span> / <span class="new-price">${saleData.new_price}</span>`;
+          productElement.appendChild(productPrice);
+          
+          salesProductsContainer.appendChild(productElement);
+        });
+      } else {
+        console.error('Request failed. Status:', xhr.status);
+        alert('Failed to fetch sales data');
+      }
+    };
+
+    // Set up event handler for network errors
+    xhr.onerror = function() {
+      console.error('Request failed. Network error');
+      alert('Failed to fetch sales data');
+    };
+
+    // Send the request
+    xhr.send();
+  }
+
+  // Call the function to fetch sales data when DOM content is loaded
+    fetchSalesData();
+    });
+
+
+    </script>
+</body>
+</html>

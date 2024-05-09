@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Love Your Skin</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #d1e7dd; /* Green */
+    }
+    header {
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header img {
+      height: 40px; /* Adjust the height as needed */
+      margin-right: 10px; /* Add some space between the image and the title */
+    }
+    header h1 {
+      font-family: 'Lobster', cursive; /* Use Lobster font for the title */
+      font-size: 2em; /* Adjust font size as needed */
+    }
+    nav {
+      background-color: #5f9ea0; /* Cadet Blue */
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 0px;
+      transition: background-color 0.3s; /* Add transition for smooth hover effect */
+    }
+    nav a:hover,
+    nav a.active {
+      background-color: #417d7f; /* Dark Green */
+    }
+    form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      max-width: 400px;
+    }
+    form label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    form input[type="text"],
+    form input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    form input[type="submit"] {
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    form input[type="submit"]:hover {
+      background-color: #5f9ea0; /* Cadet Blue */
+    }
+    footer {
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo">
+    <h1>Love Your Skin</h1>
+  </header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="cart.html">Cart</a>
+    <a href="#" class="active">Login</a>
+  </nav>
+  <form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <input type="submit" value="Login">
+  </form>
+  <footer>
+    <p>&copy; 2024 E-Commerce Website. All rights reserved.</p>
+  </footer>
+
+  <div id="errorMessage" style="color: red; text-align: center; margin-top: 10px; display: none;">Incorrect username or password.</div>
+
+<!-- Login Script -->
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission
+  
+    // Get form data
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+  
+    // Send POST request to Flask API
+    fetch('http://localhost:3000/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ 'username': username, 'password': password }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json(); // Parse response body as JSON
+      } else {
+        throw new Error('Login failed'); // Throw an error for unsuccessful login
+      }
+    })
+    .then(data => {
+      // Store user ID in local storage
+      localStorage.setItem('userId', data.userId); // Ensure data.userId is correct
+      
+      alert("Login successful");
+      window.location.href = "index.html"; // Redirect to home page after successful login
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      // Display error message
+      document.getElementById("errorMessage").style.display = "block";
+    });
+});
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  frontend_service:
+    build: ./frontend_service
+    ports:
+      - "80:80"
+    container_name: frontend_service_container
+    restart: on-failure
+    volumes:
+      - ./frontend_service:/app
+    networks:
+      - mynetwork
+
+  users_service:
+    build: ./users_service  
+    ports:
+      - "3000:3000"  
+    container_name: users_service_container
+    restart: on-failure
+    volumes:
+      - ./users_service:/app
+      - users_service_data:/app/data  
+    depends_on:
+      - userdb
+    networks:
+      - mynetwork
+  
+  userdb:
+    image: mongo
+    container_name: userdb
+    ports:
+      - "27017:27017"
+    networks:
+      - mynetwork
+    volumes:
+      - users-volume:/data/db
+  
+  orders_service:
+    build: ./orders_service  
+    ports:
+      - "5001:5001"  
+    container_name: orders_service_container
+    restart: on-failure
+    volumes:
+      - ./orders_service:/app
+      - orders_service_data:/app/data  
+    depends_on:
+      - ordersdb
+    networks:
+      - mynetwork
+  
+  ordersdb:
+    image: mongo
+    container_name: ordersdb
+    ports:
+      - "27018:27017"
+    networks:
+      - mynetwork
+    volumes:
+      - orders-volume:/data/db
+
+  sales_service:
+    build: ./sales_service  
+    ports:
+      - "5002:5002"  
+    container_name: sales_service_container
+    restart: on-failure
+    volumes:
+      - ./sales_service:/app
+      - sales_service_data:/app/data  
+    depends_on:
+      - saledb
+    networks:
+      - mynetwork  
+  
+  saledb:
+    image: mongo
+    container_name: saledb
+    ports:
+      - "27019:27017"
+    networks:
+      - mynetwork
+    volumes:
+      - sales-volume:/data/db
+
+  shopping_cart_service:
+    build: ./shopping_cart_service
+    ports:
+      - "5000:5000"  
+    container_name: shopping_cart_container
+    restart: on-failure
+    volumes:
+      - ./shopping_cart_service:/app
+       - shopping_cart_service_data:/app/data  
+    links:
+      - ordersdb
+    depends_on:
+      - cartdb
+    networks:
+      - mynetwork
+      
+  cartdb:
+    image: mongo
+    container_name: cartdb
+    ports:
+      - "27020:27017"
+    networks:
+      - mynetwork
+    volumes:
+      - cart-volume:/data/db
+
+  products_service:
+    build: ./products_service
+    container_name: products_service_container
+    ports:
+      - "5003:5003"
+    networks:
+      - mynetwork
+    links:
+      - productdb
+    restart: on-failure
+    depends_on:
+      - productdb
+    volumes:
+      - ./products_service:/app
+  productdb:
+    image: mongo
+    container_name: productdb
+    ports:
+      - "27021:27017"
+    networks:
+      - mynetwork
+    volumes:
+      - products-volume:/data/db
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:  
+  users_service_data:
+    driver: local  
+  orders_service_data:  
+    driver: local
+  sales_service_data:  
+    driver: local
+  users-volume:  
+    driver: local
+  orders-volume:  
+    driver: local
+  sales-volume:
+    driver: local
+  cart-volume:
+    driver: local
+  products-volume:
+    driver: local
+  

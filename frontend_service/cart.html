@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - Love Your Skin</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #d1e7dd; /* Green */
+    }
+    header {
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header img {
+      height: 40px; /* Adjust the height as needed */
+      margin-right: 10px; /* Add some space between the image and the title */
+    }
+    header h1 {
+      font-family: 'Lobster', cursive; /* Use Lobster font for the title */
+      font-size: 2em; /* Adjust font size as needed */
+    }
+    nav {
+      background-color: #5f9ea0; /* Cadet Blue */
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 0px;
+      transition: background-color 0.3s; /* Add transition for smooth hover effect */
+    }
+    nav a:hover,
+    nav a.active {
+      background-color: #417d7f; /* Dark Green */
+    }
+    .cart-items {
+      padding: 20px;
+    }
+    .cart-item {
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    .cart-item img {
+      max-width: 100px;
+      height: auto;
+      margin-right: 20px;
+    }
+    .cart-item-details {
+      flex: 1;
+    }
+    .order-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #417d7f; /* Sea Green */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .order-button:hover {
+      background-color: #5f9ea0; /* Cadet Blue */
+    }
+    footer {
+      background-color: #5f9ea0; /* Cadet Blue */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    /* CSS for orders section */
+    .orders-title {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      color: #333; /* Adjust color as needed */
+    }
+    .product-items{
+      padding: 20px;
+    }
+    .product-item {
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .product-item img {
+      max-width: 100px;
+      height: auto;
+      margin-right: 20px;
+    }
+
+    .product-item h3 {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+
+    .product-item p {
+      margin: 0;
+    }
+
+/* Adjust other styles as needed */
+
+
+
+/* Adjust other styles as needed */
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Logo">
+    <h1>Love Your Skin</h1>
+  </header>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="#" class="active">Cart</a>
+    <a href="login.html">Login</a>
+  </nav>
+  <div class="cart-items">
+  </div>
+  <button class="order-button">Place Order</button>
+  <div class="orders">
+    <h2 class="orders-title">Orders</h2>
+    <!-- Product items will be dynamically added here -->
+  </div>
+  <footer>
+    <p>&copy; 2024 E-Commerce Website. All rights reserved.</p>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const userId = localStorage.getItem('userId');
+
+    // Function to fetch cart items
+    function fetchCartItems() {
+        fetch(`http://localhost:5000/cart/${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cart items');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const cartItems = data.data.productIds;
+                    fetchProductDetails(cartItems);
+                } else {
+                    console.error('Error fetching cart items:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Function to fetch product details for cart items
+    function fetchProductDetails(cartItems) {
+        cartItems.forEach(productId => {
+            fetch(`http://localhost:5003/api/products/${productId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch product details');
+                    }
+                    return response.json();
+                })
+                .then(product => {
+                    renderCartItem(product.data); // Pass the product data to the rendering function
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    }
+
+    // Function to render cart items
+    function renderCartItem(product) {
+        const cartItemsContainer = document.querySelector('.cart-items');
+
+        const cartItem = document.createElement('div');
+        cartItem.classList.add('cart-item');
+
+        const productImage = document.createElement('img');
+        productImage.src = product.imagePath;
+        productImage.alt = product.name;
+        cartItem.appendChild(productImage);
+
+        const productName = document.createElement('h3');
+        productName.textContent = product.name;
+        cartItem.appendChild(productName);
+
+        const productPrice = document.createElement('p');
+        productPrice.textContent = `EGP ${product.price.toFixed(2)}`;
+        cartItem.appendChild(productPrice);
+
+        cartItemsContainer.appendChild(cartItem);
+    }
+
+    // Event listener for the "Place Order" button
+    const placeOrderButton = document.querySelector('.order-button');
+    placeOrderButton.addEventListener('click', function() {
+        fetch(`http://localhost:5000/checkout/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}) // Empty body as no additional data is required
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Order placed successfully!');
+                // Redirect to a thank you page or perform other actions as needed
+            } else {
+                throw new Error('Failed to place order');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to place order');
+        });
+    });
+
+    // Fetch cart items when the DOM is loaded
+    fetchCartItems();
+});
+// Function to fetch orders for a specific user
+function fetchOrders(userId) {
+    fetch(`http://localhost:5001/api/orders/${userId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch orders');
+            }
+            return response.json();
+        })
+        .then(orders => {
+            // Fetch product details for each order
+            orders.forEach(order => {
+                fetchProductDetails(order.productIds);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Function to fetch product details for an array of product IDs
+function fetchProductDetails(productIds) {
+    productIds.forEach(productId => {
+        fetch(`http://localhost:5003/api/products/${productId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product details');
+                }
+                return response.json();
+            })
+            .then(product => {
+                renderProduct(product.data);
+            })
+            .catch(error => console.error('Error:', error));
+    });
+}
+
+// Function to render product details
+function renderProduct(product) {
+    const ordersContainer = document.querySelector('.orders');
+    
+    const productItem = document.createElement('div');
+    productItem.classList.add('product-item');
+
+    const productName = document.createElement('h3');
+    productName.textContent = product.name;
+    productItem.appendChild(productName);
+
+    const productImage = document.createElement('img');
+    productImage.src = product.imagePath;
+    productImage.alt = product.name;
+    productItem.appendChild(productImage);
+
+    const productPrice = document.createElement('p');
+    productPrice.textContent = `Price: EGP ${product.price.toFixed(2)}`;
+    productItem.appendChild(productPrice);
+
+    ordersContainer.appendChild(productItem);
+}
+
+// Call the function to fetch orders when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const userId = localStorage.getItem('userId'); // You should retrieve this from local storage or elsewhere
+    fetchOrders(userId);
+});
+
+
+  </script> 
+</body>
+</html>
