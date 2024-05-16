@@ -6,7 +6,7 @@ This project is a simple yet powerful e-commerce platform built with HTML, Flask
 
 - **HTML Front End**: Clean and intuitive user interface for seamless browsing and purchasing.
 - **Flask RESTful APIs**: Robust backend architecture for handling requests and managing data.
-- **MongoDB Database**: Flexible and scalable database solution for storing product and user information.
+- **MongoDB NoSQL Database**: Flexible and scalable database solution for storing product and user information.
 - **Docker Integration**: Containerized deployment for easy setup and scalability.
 - **MongoDB Compass Monitoring**: Real-time monitoring of database performance and health.
 
